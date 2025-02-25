@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default async function Home() {
   return (
     <>
-      <Container className="mt-24 sm:mt-30 md:mt-56">
+      <Container className="sm:mt-30 mt-24 md:mt-56">
         <FadeIn className="max-w-3xl">
           <h1 className="font-display text-5xl font-medium tracking-tight text-neutral-950 [text-wrap:balance] sm:text-7xl">
             Your Smart Universal Income, Powered by AI & Blockchain
@@ -21,7 +21,7 @@ export default async function Home() {
             unlock financial freedom.
           </p>
           <div className="mt-8">
-            <Button href="/try">Try UBIQ Now</Button>
+            <Button href="/app">Try UBIQ Now</Button>
           </div>
         </FadeIn>
       </Container>
