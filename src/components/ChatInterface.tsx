@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Container } from './Container'
 import { GridPattern } from './GridPattern'
 import { useAccount } from 'wagmi'
+import clsx from 'clsx'
 
 type Message = {
   text: string
@@ -16,8 +17,11 @@ export function ChatInterface() {
   const [inputValue, setInputValue] = useState('')
   const [hasInteracted, setHasInteracted] = useState(false)
   const { isConnected } = useAccount()
+  const [isLoading, setIsLoading] = useState(false)
 
   const sendMessage = async (text: string) => {
+    setIsLoading(true)
+    
     // Create new message object
     const newUserMessage: Message = {
       text,
@@ -60,10 +64,10 @@ export function ChatInterface() {
       setMessages((prev) => [...prev, botMessage])
     } catch (error) {
       console.error('Error sending message:', error)
+    } finally {
+      setIsLoading(false)
+      setInputValue('')
     }
-
-    // Clear input
-    setInputValue('')
   }
 
   const handleSubmit = (text: string) => {
@@ -146,30 +150,42 @@ export function ChatInterface() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Type your message..."
-                  className="flex-1 rounded-full border border-gray-200 bg-white/80 px-4 py-2 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isLoading}
+                  className={clsx(
+                    "flex-1 rounded-full border border-gray-200 bg-white/80 px-4 py-2 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500",
+                    isLoading && "opacity-50"
+                  )}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
+                    if (e.key === 'Enter' && !isLoading) {
                       handleSubmit(inputValue)
                     }
                   }}
                 />
                 <button
                   onClick={() => handleSubmit(inputValue)}
-                  className="ml-2 rounded-full bg-blue-600 p-2 text-white transition-colors hover:bg-blue-700"
+                  disabled={isLoading}
+                  className={clsx(
+                    "ml-2 rounded-full bg-blue-600 p-2 text-white transition-colors",
+                    isLoading ? "opacity-50" : "hover:bg-blue-700"
+                  )}
                 >
-                  <svg
-                    className="h-5 w-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                    />
-                  </svg>
+                  {isLoading ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : (
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                      />
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>
