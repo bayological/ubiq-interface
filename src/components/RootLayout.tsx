@@ -17,7 +17,7 @@ import {
   ConnectWallet,
   Wallet,
   WalletDropdown,
-  WalletDropdownDisconnect,
+  WalletDropdownDisconnect
 } from '@coinbase/onchainkit/wallet'
 import {
   Address,
@@ -124,17 +124,10 @@ function Header({
                     : 'bg-neutral-950 text-white hover:bg-neutral-800 focus-visible:outline-neutral-950 active:bg-neutral-800 active:text-neutral-100',
                 )}
               >
-                <Avatar className="h-6 w-6" />
                 <Name />
               </ConnectWallet>
               <WalletDropdown>
-                <Identity className="px-4 pb-2 pt-3" hasCopyAddressOnClick>
-                  <Avatar />
-                  <Name />
-                  <Address />
-                  <EthBalance />
-                </Identity>
-                <WalletDropdownDisconnect />
+                <WalletDropdownDisconnect className="w-full px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-neutral-50" />
               </WalletDropdown>
             </Wallet>
           )}
