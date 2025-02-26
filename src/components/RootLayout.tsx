@@ -12,10 +12,23 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import clsx from 'clsx'
 import { motion, MotionConfig, useReducedMotion } from 'framer-motion'
+import { useAccount } from 'wagmi'
+import {
+  ConnectWallet,
+  Wallet,
+  WalletDropdown,
+  WalletDropdownDisconnect,
+} from '@coinbase/onchainkit/wallet'
+import {
+  Address,
+  Avatar,
+  Name,
+  Identity,
+  EthBalance,
+} from '@coinbase/onchainkit/identity'
 
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
-import { Footer } from '@/components/Footer'
 import { GridPattern } from '@/components/GridPattern'
 import { Logo, Logomark } from '@/components/Logo'
 import { Offices } from '@/components/Offices'
@@ -59,6 +72,9 @@ function Header({
   invert?: boolean
 }) {
   let { logoHovered, setLogoHovered } = useContext(RootLayoutContext)!
+  const { isConnected } = useAccount()
+  const pathname = usePathname()
+  const isAppPage = pathname === '/chat'
 
   return (
     <Container>
@@ -81,9 +97,47 @@ function Header({
           />
         </Link>
         <div className="flex items-center gap-x-8">
-          <Button href="/app" invert={invert}>
-            Launch App
-          </Button>
+          {!isAppPage ? (
+            <Button href="/chat" invert={invert}>
+              Launch App
+            </Button>
+          ) : !isConnected ? (
+            <Wallet>
+              <ConnectWallet
+                className={clsx(
+                  'group inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2',
+                  invert
+                    ? 'bg-white text-neutral-950 hover:bg-neutral-200 focus-visible:outline-white active:bg-neutral-300 active:text-neutral-600'
+                    : 'bg-neutral-950 text-white hover:bg-neutral-800 focus-visible:outline-neutral-950 active:bg-neutral-800 active:text-neutral-100',
+                )}
+              >
+                Connect Wallet
+              </ConnectWallet>
+            </Wallet>
+          ) : (
+            <Wallet>
+              <ConnectWallet
+                className={clsx(
+                  'group inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2',
+                  invert
+                    ? 'bg-white text-neutral-950 hover:bg-neutral-200 focus-visible:outline-white active:bg-neutral-300 active:text-neutral-600'
+                    : 'bg-neutral-950 text-white hover:bg-neutral-800 focus-visible:outline-neutral-950 active:bg-neutral-800 active:text-neutral-100',
+                )}
+              >
+                <Avatar className="h-6 w-6" />
+                <Name />
+              </ConnectWallet>
+              <WalletDropdown>
+                <Identity className="px-4 pb-2 pt-3" hasCopyAddressOnClick>
+                  <Avatar />
+                  <Name />
+                  <Address />
+                  <EthBalance />
+                </Identity>
+                <WalletDropdownDisconnect />
+              </WalletDropdown>
+            </Wallet>
+          )}
         </div>
       </div>
     </Container>
@@ -248,7 +302,6 @@ function RootLayoutInner({ children }: { children: React.ReactNode }) {
           />
 
           <main className="w-full flex-auto">{children}</main>
-
         </motion.div>
       </motion.div>
     </MotionConfig>

@@ -21,7 +21,7 @@ export default async function Home() {
             unlock financial freedom.
           </p>
           <div className="mt-8">
-            <Button href="/app">Try UBIQ Now</Button>
+            <Button href="/chat">Try UBIQ Now</Button>
           </div>
         </FadeIn>
       </Container>

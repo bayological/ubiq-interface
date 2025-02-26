@@ -5,6 +5,6 @@ export const metadata: Metadata = {
   description: 'UBIQ Chat Interface - Your Smart Universal Income Assistant',
 }
 
-export default function AppPage() {
+export default function ChatPage() {
   return <ChatInterface />
 }

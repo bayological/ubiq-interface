@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Container } from './Container'
 import { GridPattern } from './GridPattern'
+import { useAccount } from 'wagmi'
 
 type Message = {
   text: string
@@ -12,6 +13,7 @@ type Message = {
 
 export function ChatInterface() {
   const [hasInteracted, setHasInteracted] = useState(false)
+  const { isConnected } = useAccount()
 
   // Mock messages for demonstration
   const mockMessages: Message[] = [
@@ -29,10 +31,20 @@ export function ChatInterface() {
 
   return (
     <div className="relative h-[calc(100vh-4rem-23px)]">
-      {!hasInteracted ? (
+      {!isConnected ? (
+        // Wallet Connection Required State
+        <div className="flex h-full flex-col items-center justify-center">
+          <div className="mb-8 font-display text-3xl font-medium tracking-tight text-neutral-950 [text-wrap:balance] sm:text-5xl">
+            Connect Your Wallet to Start
+          </div>
+          <div className="text-center text-neutral-600">
+            <p className="mb-4">You need to connect your wallet to use UBIQ</p>
+          </div>
+        </div>
+      ) : !hasInteracted ? (
         // Initial Search-like Interface
         <div className="flex h-full flex-col items-center justify-center">
-          <div className="mb-8 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text font-display text-4xl font-bold text-transparent">
+          <div className="mb-8 font-display text-3xl font-medium tracking-tight text-neutral-950 [text-wrap:balance] sm:text-5xl">
             How can I help you with UBIQ today?
           </div>
           <div className="w-full max-w-2xl px-4">
