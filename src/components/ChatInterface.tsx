@@ -12,22 +12,65 @@ type Message = {
 }
 
 export function ChatInterface() {
+  const [messages, setMessages] = useState<Message[]>([])
+  const [inputValue, setInputValue] = useState('')
   const [hasInteracted, setHasInteracted] = useState(false)
   const { isConnected } = useAccount()
 
-  // Mock messages for demonstration
-  const mockMessages: Message[] = [
-    {
-      text: 'Claim my UBIQ',
+  const sendMessage = async (text: string) => {
+    // Create new message object
+    const newUserMessage: Message = {
+      text,
       isUser: true,
-      timestamp: '12:01 PM',
-    },
-    {
-      text: "You've received 103 UBIQ—adjusted for local economy",
-      isUser: false,
-      timestamp: '12:01 PM',
-    },
-  ]
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    }
+
+    // Add user message to chat
+    setMessages((prev) => [...prev, newUserMessage])
+
+    try {
+      // Send message to API
+      const response = await fetch(
+        'http://localhost:3000/b850bc30-45f8-0041-a00a-83df46d8555d/message',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: text }),
+        },
+      )
+
+      const data = await response.json()
+      console.log(data)
+
+      // Add response to chat
+      const botMessage: Message = {
+        text: data[0].text,
+        isUser: false,
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+      }
+
+      setMessages((prev) => [...prev, botMessage])
+    } catch (error) {
+      console.error('Error sending message:', error)
+    }
+
+    // Clear input
+    setInputValue('')
+  }
+
+  const handleSubmit = (text: string) => {
+    if (!text.trim()) return
+    sendMessage(text)
+    setHasInteracted(true)
+  }
 
   return (
     <div className="relative h-[calc(100vh-4rem-23px)]">
@@ -50,11 +93,13 @@ export function ChatInterface() {
           <div className="w-full max-w-2xl px-4">
             <input
               type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
               placeholder="Ask UBIQ about your income..."
               className="w-full rounded-full border border-gray-200 bg-white/80 px-6 py-4 text-lg shadow-sm backdrop-blur-sm transition-all duration-300 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  setHasInteracted(true)
+                  handleSubmit(inputValue)
                 }
               }}
             />
@@ -66,7 +111,7 @@ export function ChatInterface() {
           {/* Chat Messages */}
           <div className="flex-1 overflow-y-auto">
             <div className="mx-auto max-w-2xl space-y-6 px-4 py-6">
-              {mockMessages.map((message, index) => (
+              {messages.map((message, index) => (
                 <div
                   key={index}
                   className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
@@ -98,10 +143,20 @@ export function ChatInterface() {
               <div className="flex items-center">
                 <input
                   type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Type your message..."
                   className="flex-1 rounded-full border border-gray-200 bg-white/80 px-4 py-2 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSubmit(inputValue)
+                    }
+                  }}
                 />
-                <button className="ml-2 rounded-full bg-blue-600 p-2 text-white transition-colors hover:bg-blue-700">
+                <button
+                  onClick={() => handleSubmit(inputValue)}
+                  className="ml-2 rounded-full bg-blue-600 p-2 text-white transition-colors hover:bg-blue-700"
+                >
                   <svg
                     className="h-5 w-5"
                     fill="none"
